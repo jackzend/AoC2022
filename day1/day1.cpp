@@ -8,16 +8,23 @@
 namespace day1
 {
 
-constexpr std::string_view input_fp = "/home/jack-slip/AoC2022/input/day1.txt";
+constexpr std::string_view input_fp = "/home/jack-slip/AoC2022/input/test.txt";
+constexpr std::string_view newline_sv = "\n";
 
 std::string_view getLine(const char*& _str, const char* end)
 {
+
   const char* str = _str;
-  while (*str == '\n' || *str == '\r')
+
+  if (*str == '\n' || *str == '\r')
   {
-    if (++str == end)
-      return (_str = str), std::string_view{};
+    ++str;
+    _str = str;
+    return newline_sv;
   }
+
+  if (++str == end)
+    return (_str = str), std::string_view{};
 
   const char* start = str;
   while (str != end && *str != '\n' && *str != '\r')
