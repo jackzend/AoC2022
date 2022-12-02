@@ -1,0 +1,26 @@
+{
+    "configurations": [
+        {
+            "browse": {
+                "databaseFilename": "${default}",
+                "limitSymbolsToIncludedHeaders": false
+            },
+            "includePath": [
+                "/opt/ros/noetic/include/**",
+                "/opt/ros/melodic/include/**",
+                "/usr/include/**",
+                "${workspaceFolder}/src/perception/wheel_finder/include",
+                "${workspaceFolder}/src/localization/direction_tracker/direction_tracker_cpp/include",
+                "${workspaceFolder}/devel/.private/laser_line_extraction/include",
+                "${workspaceFolder}/src/utilities/cpp_helper_functions/include",
+                "${workspaceFolder}/devel/.private/direction_tracker_msgs/include"
+            ],
+            "name": "ROS",
+            "intelliSenseMode": "gcc-x64",
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "gnu11",
+            "cppStandard": "c++20"
+        }
+    ],
+    "version": 4
+}
