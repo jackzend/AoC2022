@@ -10,7 +10,6 @@ constexpr std::string_view input_fp = "/home/jack-slip/AoC2022/input/day3.txt";
 
 constexpr char getIdx(const char c)
 {
-  //   if (c - 'a' < 26)
   if (c - 'a' >= 0 and c - 'a' < 26)
   {
     return c - 'a';
