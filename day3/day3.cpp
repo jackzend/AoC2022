@@ -77,6 +77,7 @@ void day3(const char* fp)
   int elf_count = 0;
   while (!(rucksack = utils::getLine(line, end)).empty())
   {
+    // part 1
     beg = rucksack.begin();
     mid = beg;
     std::advance(mid, rucksack.size() / 2);
@@ -97,6 +98,7 @@ void day3(const char* fp)
     }
     seen.reset();
 
+    // part 2
     beg = rucksack.begin();
 
     auto& curr_bs = elf_count == 0 ? seen1 : elf_count == 1 ? seen2 : seen3;
