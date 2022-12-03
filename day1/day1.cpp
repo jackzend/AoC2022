@@ -49,11 +49,9 @@ void day1(const char* file)
 using namespace AoC2022;
 int main()
 {
-  utils::MilliSecondTimer ms_timer;
-
+  std::cout << "---Day 1---\n";
+  utils::MicroSecondTimer ms_timer;
   day1(input_fp.begin());
-
   float elapsed = ms_timer.getElapsed();
-
   std::cout << "Elapsed: " << elapsed << "ms\n";
 }
