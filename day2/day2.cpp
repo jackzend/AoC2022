@@ -62,5 +62,5 @@ int main()
   day2(input_fp.begin());
 
   float elapsed = ms_timer.getElapsed();
-  std::cout << "Elapsed: " << elapsed << "\n";
+  std::cout << "Elapsed: " << elapsed << "ms\n";
 };
