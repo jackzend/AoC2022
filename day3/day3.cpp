@@ -129,8 +129,8 @@ void day3(const char* fp)
 using namespace AoC2022;
 int main()
 {
-  utils::MilliSecondTimer ms_timer;
+  utils::MicroSecondTimer ms_timer;
   day3(input_fp.begin());
   float elapsed = ms_timer.getElapsed();
-  std::cout << "Elapsed: " << elapsed << "ms\n";
+  std::cout << "Elapsed: " << elapsed << "us\n";
 }

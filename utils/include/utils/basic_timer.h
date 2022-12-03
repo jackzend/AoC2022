@@ -25,5 +25,6 @@ private:
 
 using MilliSecondTimer = BasicTimer<std::chrono::duration<float, std::milli>>;
 using NanoSecondTimer = BasicTimer<std::chrono::duration<float, std::nano>>;
+using MicroSecondTimer = BasicTimer<std::chrono::duration<float, std::micro>>;
 } // namespace utils
 #endif
