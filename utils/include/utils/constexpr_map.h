@@ -26,4 +26,23 @@ struct Map
 };
 } // namespace utils
 
+// example of using this to generate constexpr map
+// static constexpr auto prio_arr = []()
+// {
+//   std::array<std::pair<char, int>, 52UL> ret{};
+//   for (char c = 'a'; c <= 'z'; ++c)
+//   {
+//     ret[getIdx(c)].first = c;
+//     ret[getIdx(c)].second = getPriority(c);
+//   }
+//   for (char c = 'A'; c <= 'Z'; ++c)
+//   {
+//     ret[getIdx(c)].first = c;
+//     ret[getIdx(c)].second = getPriority(c);
+//   }
+//   return ret;
+// }();
+
+// static constexpr auto prio_map = utils::Map<char, int, prio_arr.size()>{{prio_arr}};
+
 #endif

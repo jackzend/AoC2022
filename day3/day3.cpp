@@ -34,25 +34,6 @@ constexpr int getIdxOfFirstBit(const std::bitset<52>& bs)
   return -1;
 }
 
-// this doesn't really work much faster unless you're doing constexpr lookups
-// static constexpr auto prio_arr = []()
-// {
-//   std::array<std::pair<char, int>, 52UL> ret{};
-//   for (char c = 'a'; c <= 'z'; ++c)
-//   {
-//     ret[getIdx(c)].first = c;
-//     ret[getIdx(c)].second = getPriority(c);
-//   }
-//   for (char c = 'A'; c <= 'Z'; ++c)
-//   {
-//     ret[getIdx(c)].first = c;
-//     ret[getIdx(c)].second = getPriority(c);
-//   }
-//   return ret;
-// }();
-
-// static constexpr auto prio_map = utils::Map<char, int, prio_arr.size()>{{prio_arr}};
-
 void day3(const char* fp)
 {
   std::vector<char> buffer;
