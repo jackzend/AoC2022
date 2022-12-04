@@ -53,11 +53,62 @@ inline std::vector<std::string_view> splitSVPtr(std::string_view str, std::strin
   return output;
 }
 
+// Safe method for an efficient string_view splitter. Use this if you expect a number of tokens but
+// want some error checking
+inline void splitSVPtrInPlace(std::string_view str, std::string_view delims,
+                              std::vector<std::string_view>& vec, size_t expected_num_of_tokens)
+{
+
+  if (vec.size() != expected_num_of_tokens)
+  {
+    vec.resize(expected_num_of_tokens);
+  }
+
+  size_t i = 0;
+  for (auto first = str.data(), second = str.data(), last = first + str.size();
+       second != last && first != last; first = second + 1)
+  {
+    second = std::find_first_of(first, last, std::cbegin(delims), std::cend(delims));
+
+    if (first != second)
+    {
+      if (i < expected_num_of_tokens)
+      {
+        vec[i] = std::string_view{first, second - first};
+      }
+      else
+      {
+        vec.emplace_back(first, second - first);
+      }
+      ++i;
+    }
+  }
+}
+
+// vector.size() must == the number tokens expected in your string, otherwise this will break. Only
+// use this if you know how many tokens you expect to get, otherwise use the other InPlace method
+inline void splitSVPtrInPlaceNoCheck(std::string_view str, std::string_view delims,
+                                     std::vector<std::string_view>& vec)
+{
+  size_t i = 0;
+  for (auto first = str.data(), second = str.data(), last = first + str.size();
+       second != last && first != last; first = second + 1)
+  {
+    second = std::find_first_of(first, last, std::cbegin(delims), std::cend(delims));
+
+    if (first != second)
+    {
+      vec[i] = std::string_view{first, second - first};
+      ++i;
+    }
+  }
+}
+
 // DOES NOT DO ERROR CHECKING
 inline int stringViewToInt(const std::string_view sv)
 {
   int i;
-  auto result = std::from_chars(sv.data(), sv.data() + sv.size(), i);
+  std::from_chars(sv.data(), sv.data() + sv.size(), i);
   return i;
 }
 

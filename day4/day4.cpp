@@ -23,9 +23,11 @@ void day4(const char* fp)
   int sum_p1 = 0;
   int sum_p2 = 0;
 
+  std::vector<std::string_view> both_ranges;
+  both_ranges.resize(4UL);
   while (!(line_sv = utils::getLine(line, end)).empty())
   {
-    auto both_ranges = utils::splitSVPtr(line_sv, delim1);
+    utils::splitSVPtrInPlaceNoCheck(line_sv, delim1, both_ranges);
 
     r1_beg = utils::stringViewToInt(both_ranges[0]);
     r1_end = utils::stringViewToInt(both_ranges[1]);
