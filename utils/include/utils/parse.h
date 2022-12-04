@@ -7,6 +7,7 @@
 namespace utils
 {
 
+// this probably could be better. I didn't really bother fixing it
 inline std::string_view getLine(const char*& _str, const char* end)
 {
   const char* str = _str;
