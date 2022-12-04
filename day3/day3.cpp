@@ -132,5 +132,5 @@ int main()
   utils::MicroSecondTimer ms_timer;
   day3(input_fp.begin());
   float elapsed = ms_timer.getElapsed();
-  std::cout << "Elapsed: " << elapsed << "us\n";
+  std::cout << "Elapsed: " << elapsed << "us\n\n";
 }
