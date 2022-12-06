@@ -113,6 +113,14 @@ inline int stringViewToInt(const std::string_view sv)
   return i;
 }
 
+constexpr bool isAlpha(const char c)
+{
+  bool check1 = c - 'a' >= 0 and c - 'a' < 26;
+  bool check2 = c - 'A' >= 0 and c - 'A' < 26;
+
+  return check1 or check2;
+}
+
 } // namespace utils
 
 #endif
