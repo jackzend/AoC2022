@@ -6,7 +6,7 @@ namespace AoC2022
 {
 constexpr std::string_view input_fp = "/home/jack-slip/AoC2022/input/day6.txt";
 
-bool is_unique(const char* beg, const char* end)
+bool isUnique(const char* beg, const char* end)
 {
   std::bitset<26> seen;
   const char* temp = beg;
@@ -29,7 +29,7 @@ int findUnique(const char* start, const char* end, int dist)
 
   while (span != end)
   {
-    if (is_unique(curr, span))
+    if (isUnique(curr, span))
       return span - start;
     ++curr, ++span;
   }
