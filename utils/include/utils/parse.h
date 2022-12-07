@@ -75,7 +75,8 @@ inline void splitSVPtrInPlace(std::string_view str, std::string_view delims,
     {
       if (i < expected_num_of_tokens)
       {
-        vec[i] = std::string_view{first, second - first};
+        size_t len = second - first;
+        vec[i] = std::string_view{first, len};
       }
       else
       {
@@ -99,7 +100,8 @@ inline void splitSVPtrInPlaceNoCheck(std::string_view str, std::string_view deli
 
     if (first != second)
     {
-      vec[i] = std::string_view{first, second - first};
+      size_t len = second - first;
+      vec[i] = std::string_view{first, len};
       ++i;
     }
   }
