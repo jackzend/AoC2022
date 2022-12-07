@@ -45,8 +45,7 @@ void day5(const char* fp)
   std::vector<std::deque<char>> stack_arr_p2;
   std::copy(stack_arr.begin(), stack_arr.end(), std::back_inserter(stack_arr_p2));
 
-  // skip past 2 junk lines
-  //   utils::getLine(line, end);
+  // skip past junk line
   utils::getLine(line, end);
 
   std::vector<std::string_view> sv_vec;
@@ -101,7 +100,7 @@ using namespace AoC2022;
 int main()
 {
   std::cout << "---Day 5---\n";
-  utils::SecondTimer ms_timer;
+  utils::MicroSecondTimer ms_timer;
   day5(input_fp.begin());
   float elapsed = ms_timer.getElapsed();
   std::cout << "Elapsed: " << elapsed << "s\n\n";
