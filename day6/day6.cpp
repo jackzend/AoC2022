@@ -23,6 +23,7 @@ bool isUnique(const char* beg, const char* end)
 
 int findUnique(const char* start, const char* end, int dist)
 {
+  // TODO: This can be done in O(n), we currently do it in O(n*m) where m is dist
   const char* curr = start;
   const char* span = curr;
   std::advance(span, dist);
