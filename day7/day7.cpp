@@ -9,6 +9,7 @@
 namespace AoC2022
 {
 constexpr std::string_view input_fp = "/home/jack-slip/AoC2022/input/day7.txt";
+// constexpr std::string_view input_fp = "/home/jack-slip/Downloads/aoc_2022_day07_deep.txt";
 
 inline bool isNewDir(std::vector<std::string_view>& tokens)
 {
@@ -44,10 +45,12 @@ void day7(const char* fp)
       {
         auto top = dir_stack.top();
         dir_stack.pop();
+        dir_counts.push_back(top);
+        if (dir_stack.empty())
+          continue;
         dir_stack.top() += top;
         if (top <= 100000)
           num_under += top;
-        dir_counts.push_back(top);
       }
     }
     else
@@ -65,10 +68,12 @@ void day7(const char* fp)
   {
     auto top = dir_stack.top();
     dir_stack.pop();
+    dir_counts.push_back(top);
+    if (dir_stack.empty())
+      break;
     dir_stack.top() += top;
     if (top <= 100000)
       num_under += top;
-    dir_counts.push_back(top);
   }
 
   size_t target = 70000000 - dir_counts.back();
