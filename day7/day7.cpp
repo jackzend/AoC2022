@@ -38,10 +38,8 @@ void day7(const char* fp)
       if (isNewDir(tokens))
       {
         dir_stack.push(0);
-        // burn one line
         utils::getLine(line, end);
       }
-      //   is a ..
       else
       {
         auto top = dir_stack.top();
@@ -52,13 +50,13 @@ void day7(const char* fp)
         dir_counts.push_back(top);
       }
     }
-    else // we're loading up a dir
+    else
     {
       if (tokens[0] == "dir")
         continue;
       else
       {
-        dir_stack.top() += std::stoul(std::string(tokens[0]));
+        dir_stack.top() += utils::stringViewToInt(tokens[0]);
       }
     }
   }
