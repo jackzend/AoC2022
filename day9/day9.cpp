@@ -34,7 +34,6 @@ Point2D getMove(Point2D& curr_head, Point2D& curr_tail)
 
 inline void step(Point2D& head, Point2D& tail)
 {
-
   int man_dist = manhattanDistance(head, tail);
   double euclid_dist = euclideanDistance(head, tail);
   // if they are touching do nothing (0 is overlap, 1 is touching, 2 and diagonal is also touching)
@@ -58,7 +57,6 @@ void day9(const char* fp)
 
   utils::Point2D head{0, 0};
   utils::Point2D tail{0, 0};
-
   std::vector<Point2D> rope(10UL);
 
   std::unordered_set<utils::Point2D, Point2DHash> seen;
