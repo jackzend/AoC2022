@@ -5,6 +5,10 @@
 
 #include <compare>
 #include <unordered_set>
+
+// #include <utils/hash_table7.hpp>
+#include <utils/third_party/gtl/phmap.hpp>
+
 namespace AoC2022
 {
 using namespace utils;
@@ -35,9 +39,9 @@ Point2D getMove(Point2D& curr_head, Point2D& curr_tail)
 inline void step(Point2D& head, Point2D& tail)
 {
   int man_dist = manhattanDistance(head, tail);
-  double euclid_dist = euclideanDistance(head, tail);
+  int euclid_dist = euclideanDistanceSquared(head, tail);
   // if they are touching do nothing (0 is overlap, 1 is touching, 2 and diagonal is also touching)
-  if (man_dist == 0 or man_dist == 1 or (man_dist == 2 and std::abs(euclid_dist - 1.414 < 0.01)))
+  if (man_dist == 0 or man_dist == 1 or (man_dist == 2 and euclid_dist == 2))
     return;
 
   tail += getMove(head, tail);
@@ -58,30 +62,39 @@ void day9(const char* fp)
   utils::Point2D tail{0, 0};
   std::vector<Point2D> rope(10UL);
 
-  std::unordered_set<utils::Point2D, Point2DHash> seen;
-  std::unordered_set<utils::Point2D, Point2DHash> seen2;
+  std::vector<Point2D> seen_vec;
+  std::vector<Point2D> seen_vec2;
+
+  gtl::flat_hash_map<Point2D, int, Point2DHash> seen_map;
+  gtl::flat_hash_map<Point2D, int, Point2DHash> seen_map2;
+
+  int num_moves = 0;
+  Point2D move_mask;
 
   while (!(line_sv = utils::getLine(line, end)).empty())
   {
     utils::splitSVPtrInPlaceNoCheck(line_sv, " ", tokens);
-    int num_moves = utils::stringViewToInt(tokens[1]);
-
+    num_moves = utils::stringViewToInt(tokens[1]);
+    move_mask = getMoveMask(tokens[0]);
     for (int i = 0; i < num_moves; ++i)
     {
-      head += getMoveMask(tokens[0]);
+      head += move_mask;
       step(head, tail);
-      seen.insert(tail);
+      //   seen_vec.push_back(tail);
+      seen_map[tail] = 1;
 
-      rope[0] += getMoveMask(tokens[0]);
+      rope[0] += move_mask;
       for (int i = 0; i < rope.size() - 1; ++i)
       {
         step(rope[i], rope[i + 1]);
       }
-      seen2.insert(rope.back());
+      //   seen_vec2.push_back(rope.back());
+      seen_map2[rope.back()] = 1;
     }
   }
-  std::cout << "P1: " << seen.size() << '\n';
-  std::cout << "P2: " << seen2.size() << '\n';
+
+  std::cout << "P1: " << seen_map.size() << '\n';  // 6494
+  std::cout << "P2: " << seen_map2.size() << '\n'; // 2691
 }
 } // namespace AoC2022
 

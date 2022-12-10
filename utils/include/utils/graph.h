@@ -58,6 +58,13 @@ constexpr double euclideanDistance(const Point2D& p1, const Point2D& p2)
   return std::sqrt(dx * dx + dy * dy);
 }
 
+constexpr int euclideanDistanceSquared(const Point2D& p1, const Point2D& p2)
+{
+  int dx = p1.x - p2.x;
+  int dy = p1.y - p2.y;
+  return dx * dx + dy * dy;
+}
+
 struct Point2DHash
 {
   std::size_t operator()(const Point2D& p) const noexcept
