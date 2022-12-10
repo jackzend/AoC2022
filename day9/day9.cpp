@@ -39,7 +39,6 @@ inline void step(Point2D& head, Point2D& tail)
   // if they are touching do nothing (0 is overlap, 1 is touching, 2 and diagonal is also touching)
   if (man_dist == 0 or man_dist == 1 or (man_dist == 2 and std::abs(euclid_dist - 1.414 < 0.01)))
     return;
-  // tail goes to old head
 
   tail += getMove(head, tail);
 }
