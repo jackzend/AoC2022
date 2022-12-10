@@ -13,7 +13,7 @@ namespace AoC2022
 using namespace utils;
 constexpr std::string_view input_fp = "/home/jack-slip/AoC2022/input/day9.txt";
 
-const Point2D getMoveMask(const std::string_view& dir)
+const Point2D getMoveMask(const std::string_view dir)
 {
   switch (dir[0])
   {
