@@ -3,30 +3,37 @@
 #include <utils/graph.h>
 #include <utils/parse.h>
 
+#include <compare>
 #include <unordered_set>
 namespace AoC2022
 {
 using namespace utils;
 constexpr std::string_view input_fp = "/home/jack-slip/AoC2022/input/day9.txt";
 
-constexpr Point2D getMoveMask(const std::string_view& dir)
+const Point2D getMoveMask(const std::string_view& dir)
 {
-  constexpr std::array<std::pair<std::string_view, Point2D>, 4UL> move_mask_arr{
-      {{"U", {0, 1}}, {"D", {0, -1}}, {"R", {1, 0}}, {"L", {-1, 0}}}};
-  constexpr auto move_mask_map =
-      utils::Map<std::string_view, Point2D, move_mask_arr.size()>{{move_mask_arr}};
-
-  return move_mask_map.at(dir);
+  switch (dir[0])
+  {
+  case 'U':
+    return {0, 1};
+  case 'D':
+    return {0, -1};
+  case 'R':
+    return {1, 0};
+  case 'L':
+    return {-1, 0};
+  default:
+    throw std::runtime_error("Invalid direction");
+  }
 }
 
-// constexpr double dist = euclideanDistance({0, 0}, {1, 2});
-
-inline void step(Point2D& head, Point2D& tail, std::string_view dir)
+Point2D getMove(Point2D& curr_head, Point2D& curr_tail)
 {
-  Point2D mask = getMoveMask(dir);
+  return {sgn(curr_head.x - curr_tail.x), sgn(curr_head.y - curr_tail.y)};
+}
 
-  auto temp = head;
-  head += mask;
+inline void step(Point2D& head, Point2D& tail)
+{
 
   int man_dist = manhattanDistance(head, tail);
   double euclid_dist = euclideanDistance(head, tail);
@@ -34,7 +41,8 @@ inline void step(Point2D& head, Point2D& tail, std::string_view dir)
   if (man_dist == 0 or man_dist == 1 or (man_dist == 2 and std::abs(euclid_dist - 1.414 < 0.01)))
     return;
   // tail goes to old head
-  tail = temp;
+
+  tail += getMove(head, tail);
 }
 
 void day9(const char* fp)
@@ -50,20 +58,33 @@ void day9(const char* fp)
 
   utils::Point2D head{0, 0};
   utils::Point2D tail{0, 0};
-  std::unordered_set<utils::Point2D, utils::Point2DHash> seen;
+
+  std::vector<Point2D> rope(10UL);
+
+  std::unordered_set<utils::Point2D, Point2DHash> seen;
+  std::unordered_set<utils::Point2D, Point2DHash> seen2;
 
   while (!(line_sv = utils::getLine(line, end)).empty())
   {
     utils::splitSVPtrInPlaceNoCheck(line_sv, " ", tokens);
     int num_moves = utils::stringViewToInt(tokens[1]);
+
     for (int i = 0; i < num_moves; ++i)
     {
-      step(head, tail, tokens[0]);
+      head += getMoveMask(tokens[0]);
+      step(head, tail);
       seen.insert(tail);
+
+      rope[0] += getMoveMask(tokens[0]);
+      for (int i = 0; i < rope.size() - 1; ++i)
+      {
+        step(rope[i], rope[i + 1]);
+      }
+      seen2.insert(rope.back());
     }
   }
-
   std::cout << "P1: " << seen.size() << '\n';
+  std::cout << "P2: " << seen2.size() << '\n';
 }
 } // namespace AoC2022
 

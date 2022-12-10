@@ -7,10 +7,10 @@ namespace utils
 
 struct Point2D
 {
-  int x;
-  int y;
+  int x{0};
+  int y{0};
 
-  bool operator<=>(const Point2D&) const = default;
+  auto operator<=>(const Point2D&) const = default;
   Point2D operator+(const Point2D& other) const { return {x + other.x, y + other.y}; }
   Point2D operator-(const Point2D& other) const { return {x - other.x, y - other.y}; }
   Point2D& operator+=(const Point2D& other)
@@ -40,6 +40,11 @@ struct Point2D
     return std::sqrt(dx * dx + dy * dy);
   }
 };
+template <typename T>
+int sgn(T val)
+{
+  return (T(0) < val) - (val < T(0));
+}
 
 constexpr int manhattanDistance(const Point2D& p1, const Point2D& p2)
 {
