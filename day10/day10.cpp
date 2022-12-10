@@ -35,16 +35,14 @@ void day10(const char* fp)
     if (line_sv[0] == 'n')
     {
       ++cycle;
-      // Start of the cycle
       if (cycle == 20 or cycle % 40 == 20)
         signal_strength += X * cycle;
-
-      // draw pixel
       drawPixel(screen, cycle - 1, X);
 
       continue;
     }
     utils::splitSVPtrInPlaceNoCheck(line_sv, " ", tokens);
+    // 2 cycles
     ++cycle;
     if (cycle == 20 or cycle % 40 == 20)
       signal_strength += X * cycle;
