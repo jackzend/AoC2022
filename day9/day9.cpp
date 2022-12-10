@@ -6,7 +6,6 @@
 #include <compare>
 #include <unordered_set>
 
-// #include <utils/hash_table7.hpp>
 #include <utils/third_party/gtl/phmap.hpp>
 
 namespace AoC2022
@@ -62,9 +61,6 @@ void day9(const char* fp)
   utils::Point2D tail{0, 0};
   std::vector<Point2D> rope(10UL);
 
-  std::vector<Point2D> seen_vec;
-  std::vector<Point2D> seen_vec2;
-
   gtl::flat_hash_map<Point2D, int, Point2DHash> seen_map;
   gtl::flat_hash_map<Point2D, int, Point2DHash> seen_map2;
 
@@ -80,7 +76,6 @@ void day9(const char* fp)
     {
       head += move_mask;
       step(head, tail);
-      //   seen_vec.push_back(tail);
       seen_map[tail] = 1;
 
       rope[0] += move_mask;
@@ -88,13 +83,12 @@ void day9(const char* fp)
       {
         step(rope[i], rope[i + 1]);
       }
-      //   seen_vec2.push_back(rope.back());
       seen_map2[rope.back()] = 1;
     }
   }
 
-  std::cout << "P1: " << seen_map.size() << '\n';  // 6494
-  std::cout << "P2: " << seen_map2.size() << '\n'; // 2691
+  std::cout << "P1: " << seen_map.size() << '\n';
+  std::cout << "P2: " << seen_map2.size() << '\n';
 }
 } // namespace AoC2022
 
