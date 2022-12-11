@@ -39,3 +39,6 @@ target_compile_options(${PROJECT_NAME}_day9 PUBLIC -std=c++20 -O3 -Ofast)
 
 add_executable(${PROJECT_NAME}_day10 day10/day10.cpp)
 target_compile_options(${PROJECT_NAME}_day10 PUBLIC -std=c++20 -O3)
+
+add_executable(${PROJECT_NAME}_day11 day11/day11.cpp)
+target_compile_options(${PROJECT_NAME}_day11 PUBLIC -std=c++20 -O3)
