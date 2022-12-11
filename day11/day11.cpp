@@ -6,7 +6,7 @@
 namespace AoC2022
 {
 using namespace boost::multiprecision;
-constexpr std::string_view input_fp = "/home/jack-slip/AoC2022/input/day11_sample.txt";
+constexpr std::string_view input_fp = "/home/jack-slip/AoC2022/input/day11.txt";
 
 struct Monkey
 {
@@ -105,10 +105,6 @@ void day11(const char* fp)
 
   for (int i = 0; i < 20; ++i)
   {
-    if (i == 1000)
-    {
-      int x = i;
-    }
     for (int j = 0; j < monkeys.size(); ++j)
     {
       auto& monk = monkeys[j];
@@ -117,15 +113,7 @@ void day11(const char* fp)
       {
         int64_t& item = monk.items[k];
         monk.op(item);
-        if (item < 0)
-        {
-          std::cout << "OVERFLOW\n";
-        }
-        // if (item % 2 == 0)
-        // {
-        //   item /= 2;
-        // }
-        // item /= 3;
+        item /= 3;
         if (monk.test_op(item))
         {
           monkeys[monk.true_dest].items.push_back(item);
