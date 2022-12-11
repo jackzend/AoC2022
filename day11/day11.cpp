@@ -1,16 +1,15 @@
-#include <boost/multiprecision/cpp_int.hpp>
+#include <numeric>
 #include <utils/basic_timer.h>
 #include <utils/constexpr_map.h>
 #include <utils/parse.h>
-#include <utils/third_party/emhash/hash_set8.hpp>
 namespace AoC2022
 {
-using namespace boost::multiprecision;
 constexpr std::string_view input_fp = "/home/jack-slip/AoC2022/input/day11.txt";
 
 struct Monkey
 {
   int id;
+  int test_val;
   std::vector<int64_t> items;
   std::function<void(int64_t&)> op;
   std::function<bool(int64_t)> test_op;
@@ -19,7 +18,7 @@ struct Monkey
   size_t inspection_count{0};
 };
 
-std::function<void(int64_t&)> makeOp(std::vector<std::string_view>& tokens)
+inline std::function<void(int64_t&)> makeOp(std::vector<std::string_view>& tokens)
 {
   if (tokens[4] == "+")
   {
@@ -48,9 +47,10 @@ std::function<void(int64_t&)> makeOp(std::vector<std::string_view>& tokens)
   }
 }
 
-std::function<bool(int64_t)> makeTestOp(std::vector<std::string_view>& tokens)
+inline std::function<bool(int64_t)> makeTestOp(std::vector<std::string_view>& tokens, Monkey& monk)
 {
   int val = utils::stringViewToInt(tokens[3]);
+  monk.test_val = val;
   return [val](int64_t a) { return a % val == 0; };
 }
 
@@ -75,7 +75,7 @@ Monkey makeMonkey(std::string_view line, const char*& start, const char* end)
 
   line = utils::getLine(start, end);
   tokens = utils::splitSVPtr(line, " ");
-  monk.test_op = makeTestOp(tokens);
+  monk.test_op = makeTestOp(tokens, monk);
 
   line = utils::getLine(start, end);
   tokens = utils::splitSVPtr(line, " ");
@@ -103,6 +103,12 @@ void day11(const char* fp)
     monkeys.push_back(makeMonkey(line_sv, line, end));
   }
 
+  int64_t special_value =
+      std::accumulate(monkeys.begin(), monkeys.end(), 1,
+                      [](int64_t a, const Monkey& curr) { return a * curr.test_val; });
+
+  std::vector<Monkey> monkeys2 = monkeys;
+
   for (int i = 0; i < 20; ++i)
   {
     for (int j = 0; j < monkeys.size(); ++j)
@@ -114,6 +120,7 @@ void day11(const char* fp)
         int64_t& item = monk.items[k];
         monk.op(item);
         item /= 3;
+
         if (monk.test_op(item))
         {
           monkeys[monk.true_dest].items.push_back(item);
@@ -131,12 +138,50 @@ void day11(const char* fp)
             [](const Monkey& a, const Monkey& b)
             { return a.inspection_count < b.inspection_count; });
 
-  std::cout << "Inspection Count 1 " << monkeys[monkeys.size() - 1].inspection_count << "\n";
-  std::cout << "Inspection Count 2 " << monkeys[monkeys.size() - 2].inspection_count << "\n";
   std::cout << "P1: "
             << monkeys[monkeys.size() - 1].inspection_count *
                    monkeys[monkeys.size() - 2].inspection_count
             << "\n";
+
+  for (int i = 0; i < 10000; ++i)
+  {
+    for (int j = 0; j < monkeys2.size(); ++j)
+    {
+      auto& monk = monkeys2[j];
+      monk.inspection_count += monk.items.size();
+      for (int k = 0; k < monk.items.size(); ++k)
+      {
+        int64_t& item = monk.items[k];
+        monk.op(item);
+
+        if (item > special_value)
+        {
+          item = item % special_value;
+        }
+
+        if (monk.test_op(item))
+        {
+          monkeys2[monk.true_dest].items.push_back(item);
+        }
+        else
+        {
+          monkeys2[monk.false_dest].items.push_back(item);
+        }
+      }
+      monk.items.clear();
+    }
+  }
+
+  std::sort(monkeys2.begin(), monkeys2.end(),
+            [](const Monkey& a, const Monkey& b)
+            { return a.inspection_count < b.inspection_count; });
+
+  std::cout << "P2: "
+            << monkeys2[monkeys2.size() - 1].inspection_count *
+                   monkeys2[monkeys2.size() - 2].inspection_count
+            << "\n";
+
+  // 21553910156
 }
 } // namespace AoC2022
 
