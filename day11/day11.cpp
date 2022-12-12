@@ -168,7 +168,7 @@ void day11(const char* fp)
   std::cout << "P1: "
             << monkeys[monkeys.size() - 1].inspection_count *
                    monkeys[monkeys.size() - 2].inspection_count
-            << "\n"; // 76728
+            << "\n";
 
   for (int i = 0; i < 10000; ++i)
   {
@@ -206,8 +206,6 @@ void day11(const char* fp)
             << monkeys2[monkeys2.size() - 1].inspection_count *
                    monkeys2[monkeys2.size() - 2].inspection_count
             << "\n";
-
-  // 21553910156
 }
 } // namespace AoC2022
 
