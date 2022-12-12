@@ -19,7 +19,7 @@ enum class OP
 struct Monkey
 {
   int test_val;
-  std::vector<std::shared_ptr<int64_t>> items;
+  std::vector<int64_t> items;
   OP op;
 
   int op_val{0};
@@ -62,8 +62,7 @@ void getOp(std::vector<std::string_view>& tokens, Monkey& m)
   }
 }
 
-Monkey makeMonkey(std::string_view line, const char*& start, const char* end,
-                  std::vector<std::shared_ptr<int64_t>>& int_buff)
+Monkey makeMonkey(std::string_view line, const char*& start, const char* end)
 {
   Monkey monk;
   line = utils::getLine(start, end);
@@ -71,11 +70,7 @@ Monkey makeMonkey(std::string_view line, const char*& start, const char* end,
 
   for (int i = 2; i < tokens.size(); i += 1)
   {
-    auto temp = tokens[i];
-    int_buff.push_back(
-        std::make_shared<int64_t>(static_cast<int64_t>(utils::stringViewToInt(tokens[i]))));
-    auto ptr = int_buff.back();
-    monk.items.push_back(std::move(ptr));
+    monk.items.push_back(static_cast<int64_t>(utils::stringViewToInt(tokens[i])));
   }
 
   line = utils::getLine(start, end);
@@ -127,34 +122,17 @@ void day11(const char* fp)
   std::string_view line_sv;
   std::vector<Monkey> monkeys;
   std::vector<Monkey> monkeys2;
-  std::vector<std::shared_ptr<int64_t>> int_buff;
-  std::vector<std::shared_ptr<int64_t>> int_buff2;
+
   while (!(line_sv = utils::getLine(line, end)).empty())
   {
-    monkeys.push_back(makeMonkey(line_sv, line, end, int_buff));
+    monkeys.push_back(makeMonkey(line_sv, line, end));
   }
 
-  // deep monkey copy lol
   monkeys2 = monkeys;
-  for (int i = 0; i < monkeys.size(); ++i)
-  {
-    auto& m = monkeys[i];
-    auto& m2 = monkeys2[i];
-    m2.items.clear();
-    for (int j = 0; j < m.items.size(); ++j)
-    {
-      auto item = m.items[j];
-      int_buff2.push_back(std::make_shared<int64_t>(*item));
-      auto ptr = int_buff2.back();
-      m2.items.push_back(std::move(ptr));
-    }
-  }
 
   int64_t special_value =
       std::accumulate(monkeys.begin(), monkeys.end(), 1,
                       [](int64_t a, const Monkey& curr) { return a * curr.test_val; });
-
-  // std::vector<Monkey> monkeys2 = monkeys;
 
   for (int i = 0; i < 20; ++i)
   {
@@ -164,19 +142,19 @@ void day11(const char* fp)
       monk.inspection_count += monk.items.size();
       for (int k = 0; k < monk.items.size(); ++k)
       {
-        auto item = monk.items[k];
+        auto& item = monk.items[k];
 
-        doOp(*item, monk.op, monk.op_val);
+        doOp(item, monk.op, monk.op_val);
 
-        *item /= 3;
+        item /= 3;
 
-        if (*item % monk.test_val == 0)
+        if (item % monk.test_val == 0)
         {
-          monkeys[monk.true_dest].items.push_back(std::move(item));
+          monkeys[monk.true_dest].items.push_back(item);
         }
         else
         {
-          monkeys[monk.false_dest].items.push_back(std::move(item));
+          monkeys[monk.false_dest].items.push_back(item);
         }
       }
       monk.items.clear();
@@ -200,20 +178,20 @@ void day11(const char* fp)
       monk.inspection_count += monk.items.size();
       for (int k = 0; k < monk.items.size(); ++k)
       {
-        auto item = monk.items[k];
-        doOp(*item, monk.op, monk.op_val);
-        if (*item > special_value)
+        auto& item = monk.items[k];
+        doOp(item, monk.op, monk.op_val);
+        if (item > special_value)
         {
-          *item = *item % special_value;
+          item = item % special_value;
         }
 
-        if (*item % monk.test_val == 0)
+        if (item % monk.test_val == 0)
         {
-          monkeys2[monk.true_dest].items.push_back(std::move(item));
+          monkeys2[monk.true_dest].items.push_back(item);
         }
         else
         {
-          monkeys2[monk.false_dest].items.push_back(std::move(item));
+          monkeys2[monk.false_dest].items.push_back(item);
         }
       }
       monk.items.clear();
