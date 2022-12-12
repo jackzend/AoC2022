@@ -2,43 +2,58 @@
 #include <utils/basic_timer.h>
 #include <utils/constexpr_map.h>
 #include <utils/parse.h>
+
+#include <memory>
 namespace AoC2022
 {
 constexpr std::string_view input_fp = "/home/jack-slip/AoC2022/input/day11.txt";
 
+enum class OP
+{
+  PLUS,
+  DOUBLE,
+  MULTIPLY,
+  SQUARE
+};
+
 struct Monkey
 {
-  int id;
   int test_val;
-  std::vector<int64_t> items;
-  std::function<void(int64_t&)> op;
-  std::function<bool(int64_t)> test_op;
+  std::vector<std::shared_ptr<int64_t>> items;
+  OP op;
+
+  int op_val{0};
+
   int true_dest;
   int false_dest;
   size_t inspection_count{0};
 };
 
-inline std::function<void(int64_t&)> makeOp(std::vector<std::string_view>& tokens)
+void getOp(std::vector<std::string_view>& tokens, Monkey& m)
 {
   if (tokens[4] == "+")
   {
     // Make a pluser op
     if (tokens[5] != "old")
     {
-      int val = utils::stringViewToInt(tokens[5]);
-      return [val](int64_t& a) { a += val; };
+      m.op = OP::PLUS;
+      m.op_val = utils::stringViewToInt(tokens[5]);
+      return;
     }
-    return [](int64_t& a) { a += a; };
+    m.op = OP::DOUBLE;
+    return;
   }
   else if (tokens[4] == "*")
   {
     // Make a multiplier op
     if (tokens[5] != "old")
     {
-      int val = utils::stringViewToInt(tokens[5]);
-      return [val](int64_t& a) { a *= val; };
+      m.op = OP::MULTIPLY;
+      m.op_val = utils::stringViewToInt(tokens[5]);
+      return;
     }
-    return [](int64_t& a) { a *= a; };
+    m.op = OP::SQUARE;
+    return;
   }
   else
   {
@@ -47,35 +62,29 @@ inline std::function<void(int64_t&)> makeOp(std::vector<std::string_view>& token
   }
 }
 
-inline std::function<bool(int64_t)> makeTestOp(std::vector<std::string_view>& tokens, Monkey& monk)
-{
-  int val = utils::stringViewToInt(tokens[3]);
-  monk.test_val = val;
-  return [val](int64_t a) { return a % val == 0; };
-}
-
-Monkey makeMonkey(std::string_view line, const char*& start, const char* end)
+Monkey makeMonkey(std::string_view line, const char*& start, const char* end,
+                  std::vector<std::shared_ptr<int64_t>>& int_buff)
 {
   Monkey monk;
-  auto tokens = utils::splitSVPtr(line, " :");
-  monk.id = utils::stringViewToInt(tokens[1]);
-
   line = utils::getLine(start, end);
+  auto tokens = utils::splitSVPtr(line, " ,");
 
-  tokens = utils::splitSVPtr(line, " ,");
   for (int i = 2; i < tokens.size(); i += 1)
   {
     auto temp = tokens[i];
-    monk.items.push_back(static_cast<int64_t>(utils::stringViewToInt(tokens[i])));
+    int_buff.push_back(
+        std::make_shared<int64_t>(static_cast<int64_t>(utils::stringViewToInt(tokens[i]))));
+    auto ptr = int_buff.back();
+    monk.items.push_back(std::move(ptr));
   }
 
   line = utils::getLine(start, end);
   tokens = utils::splitSVPtr(line, " ");
-  monk.op = makeOp(tokens);
+  getOp(tokens, monk);
 
   line = utils::getLine(start, end);
   tokens = utils::splitSVPtr(line, " ");
-  monk.test_op = makeTestOp(tokens, monk);
+  monk.test_val = utils::stringViewToInt(tokens[3]);
 
   line = utils::getLine(start, end);
   tokens = utils::splitSVPtr(line, " ");
@@ -89,6 +98,25 @@ Monkey makeMonkey(std::string_view line, const char*& start, const char* end)
   return monk;
 }
 
+inline void doOp(int64_t& item, OP op, int op_val)
+{
+  switch (op)
+  {
+  case OP::PLUS:
+    item += op_val;
+    break;
+  case OP::DOUBLE:
+    item *= 2;
+    break;
+  case OP::MULTIPLY:
+    item *= op_val;
+    break;
+  case OP::SQUARE:
+    item *= item;
+    break;
+  }
+}
+
 void day11(const char* fp)
 {
   std::vector<char> buffer;
@@ -98,16 +126,35 @@ void day11(const char* fp)
 
   std::string_view line_sv;
   std::vector<Monkey> monkeys;
+  std::vector<Monkey> monkeys2;
+  std::vector<std::shared_ptr<int64_t>> int_buff;
+  std::vector<std::shared_ptr<int64_t>> int_buff2;
   while (!(line_sv = utils::getLine(line, end)).empty())
   {
-    monkeys.push_back(makeMonkey(line_sv, line, end));
+    monkeys.push_back(makeMonkey(line_sv, line, end, int_buff));
+  }
+
+  // deep monkey copy lol
+  monkeys2 = monkeys;
+  for (int i = 0; i < monkeys.size(); ++i)
+  {
+    auto& m = monkeys[i];
+    auto& m2 = monkeys2[i];
+    m2.items.clear();
+    for (int j = 0; j < m.items.size(); ++j)
+    {
+      auto item = m.items[j];
+      int_buff2.push_back(std::make_shared<int64_t>(*item));
+      auto ptr = int_buff2.back();
+      m2.items.push_back(std::move(ptr));
+    }
   }
 
   int64_t special_value =
       std::accumulate(monkeys.begin(), monkeys.end(), 1,
                       [](int64_t a, const Monkey& curr) { return a * curr.test_val; });
 
-  std::vector<Monkey> monkeys2 = monkeys;
+  // std::vector<Monkey> monkeys2 = monkeys;
 
   for (int i = 0; i < 20; ++i)
   {
@@ -117,17 +164,19 @@ void day11(const char* fp)
       monk.inspection_count += monk.items.size();
       for (int k = 0; k < monk.items.size(); ++k)
       {
-        int64_t& item = monk.items[k];
-        monk.op(item);
-        item /= 3;
+        auto item = monk.items[k];
 
-        if (monk.test_op(item))
+        doOp(*item, monk.op, monk.op_val);
+
+        *item /= 3;
+
+        if (*item % monk.test_val == 0)
         {
-          monkeys[monk.true_dest].items.push_back(item);
+          monkeys[monk.true_dest].items.push_back(std::move(item));
         }
         else
         {
-          monkeys[monk.false_dest].items.push_back(item);
+          monkeys[monk.false_dest].items.push_back(std::move(item));
         }
       }
       monk.items.clear();
@@ -141,7 +190,7 @@ void day11(const char* fp)
   std::cout << "P1: "
             << monkeys[monkeys.size() - 1].inspection_count *
                    monkeys[monkeys.size() - 2].inspection_count
-            << "\n";
+            << "\n"; // 76728
 
   for (int i = 0; i < 10000; ++i)
   {
@@ -151,21 +200,20 @@ void day11(const char* fp)
       monk.inspection_count += monk.items.size();
       for (int k = 0; k < monk.items.size(); ++k)
       {
-        int64_t& item = monk.items[k];
-        monk.op(item);
-
-        if (item > special_value)
+        auto item = monk.items[k];
+        doOp(*item, monk.op, monk.op_val);
+        if (*item > special_value)
         {
-          item = item % special_value;
+          *item = *item % special_value;
         }
 
-        if (monk.test_op(item))
+        if (*item % monk.test_val == 0)
         {
-          monkeys2[monk.true_dest].items.push_back(item);
+          monkeys2[monk.true_dest].items.push_back(std::move(item));
         }
         else
         {
-          monkeys2[monk.false_dest].items.push_back(item);
+          monkeys2[monk.false_dest].items.push_back(std::move(item));
         }
       }
       monk.items.clear();
