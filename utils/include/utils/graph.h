@@ -74,57 +74,5 @@ struct Point2DHash
   }
 };
 
-template <typename Graph, typename Idx, typename IdxHash>
-size_t dijkstra(const Graph& graph, const Idx& start, const Idx& end,
-                std::function<std::vector<Idx>(const Graph&, const Idx&)> gen_neighbors)
-{
-  std::unordered_map<Idx, size_t, IdxHash> dist;
-  std::unordered_map<Idx, Idx, IdxHash> prev;
-  std::unordered_map<Idx, bool, IdxHash> visited;
-  std::unordered_map<Idx, size_t, IdxHash> priority_queue;
-
-  dist[start] = 0;
-  priority_queue[start] = 0;
-
-  while (!priority_queue.empty())
-  {
-    auto [u, _] = *priority_queue.begin();
-    priority_queue.erase(priority_queue.begin());
-
-    if (u == end)
-    {
-      break;
-    }
-
-    visited[u] = true;
-
-    for (auto v : gen_neighbors(graph, u))
-    {
-      if (visited[v])
-      {
-        continue;
-      }
-
-      size_t alt = dist[u] + 1;
-      if (dist.find(v) == dist.end() || alt < dist[v])
-      {
-        dist[v] = alt;
-        prev[v] = u;
-        priority_queue[v] = alt;
-      }
-    }
-  }
-
-  size_t num_steps = 0;
-  auto curr = end;
-  while (curr != start)
-  {
-    curr = prev[curr];
-    ++num_steps;
-  }
-
-  return num_steps;
-}
-
 } // namespace utils
 #endif // GRAPH_H

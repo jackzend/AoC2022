@@ -43,66 +43,6 @@ void day12(const char* fp)
     }
     ++rows;
   }
-
-  // x is col, y is row
-  auto get_idx = [cols](const utils::Point2D& pos) { return (size_t)(pos.x + pos.y * cols); };
-
-  std::function<std::vector<utils::Point2D>(const std::vector<char>&, const utils::Point2D&)>
-      gen_neighbors =
-          [get_idx, rows, cols](const std::vector<char>& grid, const utils::Point2D& pos)
-  {
-    std::vector<utils::Point2D> neighbors;
-    char curr = grid[get_idx(pos)];
-
-    for (int i = 0; i < 4; ++i)
-    {
-      utils::Point2D neighbor = pos;
-      switch (i)
-      {
-      case 0:
-        neighbor.y -= 1;
-        break;
-      case 1:
-        neighbor.y += 1;
-        break;
-      case 2:
-        neighbor.x -= 1;
-        break;
-      case 3:
-        neighbor.x += 1;
-        break;
-      }
-
-      if (neighbor.x < 0 || neighbor.y < 0 || neighbor.x >= cols || neighbor.y >= rows)
-      {
-        continue;
-      }
-
-      char neighbor_val = grid[get_idx(neighbor)];
-      if (curr == 'S')
-      {
-        curr = 'a';
-      }
-      else if (curr == 'E')
-      {
-        curr = 'z';
-      }
-      int val = neighbor_val - curr;
-      if (val > 1)
-      {
-        continue;
-      }
-
-      neighbors.push_back(neighbor);
-    }
-
-    return neighbors;
-  };
-
-  int num_steps = utils::dijkstra<std::vector<char>, utils::Point2D, utils::Point2DHash>(
-      grid, start, end_pt, gen_neighbors);
-
-  std::cout << "P1: " << num_steps << '\n';
 }
 } // namespace AoC2022
 
