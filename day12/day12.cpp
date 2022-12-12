@@ -5,7 +5,7 @@
 
 namespace AoC2022
 {
-constexpr std::string_view input_fp = "/home/jack-slip/AoC2022/input/day12_sample.txt";
+constexpr std::string_view input_fp = "/home/jack-slip/AoC2022/input/day12.txt";
 
 void day12(const char* fp)
 {
