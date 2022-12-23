@@ -1,4 +1,5 @@
 #include <queue>
+#include <set>
 #include <utils/basic_timer.h>
 #include <utils/constexpr_map.h>
 #include <utils/graph.h>
@@ -32,6 +33,75 @@ std::vector<utils::Point2D> getNeighbors(const std::vector<char>& grid, const ut
   }
 
   return neighbors;
+}
+
+std::vector<utils::Point2D> aStar(const std::vector<char>& grid, const utils::Point2D& start,
+                                  const utils::Point2D& end, int rows, int cols)
+{
+  struct pq_item
+  {
+    utils::Point2D pt;
+    int f_score;
+  };
+
+  struct pq_item_compare
+  {
+    bool operator()(const pq_item& lhs, const pq_item& rhs) const
+    {
+      return lhs.f_score > rhs.f_score;
+    }
+  };
+
+  std::priority_queue<pq_item, std::vector<pq_item>, pq_item_compare> open_set;
+  gtl::flat_hash_map<utils::Point2D, utils::Point2D, utils::Point2DHash> came_from;
+  std::vector<int> g_score(rows * cols, std::numeric_limits<int>::max());
+  std::vector<int> f_score(rows * cols, std::numeric_limits<int>::max());
+
+  g_score[getIdx(start.y, start.x, cols)] = 0;
+  f_score[getIdx(start.y, start.x, cols)] = utils::manhattanDistance(start, end);
+
+  pq_item start_item{start, f_score[getIdx(start.y, start.x, cols)]};
+
+  open_set.push(start_item);
+
+  while (!open_set.empty())
+  {
+    auto curr = open_set.top();
+    open_set.pop();
+
+    if (curr.pt == end)
+    {
+      std::vector<utils::Point2D> path;
+      auto curr_pt = curr.pt;
+      while (curr_pt != start)
+      {
+        path.push_back(curr_pt);
+        curr_pt = came_from[curr_pt];
+      }
+      path.push_back(start);
+      std::reverse(path.begin(), path.end());
+      return path;
+    }
+
+    auto neighbors = getNeighbors(grid, curr.pt, rows, cols);
+
+    for (const auto& neighbor : neighbors)
+    {
+      int tentative_g_score = g_score[getIdx(curr.pt.y, curr.pt.x, cols)] + 1;
+
+      if (tentative_g_score < g_score[getIdx(neighbor.y, neighbor.x, cols)])
+      {
+        came_from[neighbor] = curr.pt;
+        g_score[getIdx(neighbor.y, neighbor.x, cols)] = tentative_g_score;
+        f_score[getIdx(neighbor.y, neighbor.x, cols)] =
+            tentative_g_score + 1 * utils::manhattanDistance(neighbor, end);
+
+        pq_item neighbor_item{neighbor, f_score[getIdx(neighbor.y, neighbor.x, cols)]};
+        open_set.push(neighbor_item);
+      }
+    }
+  }
+  return {};
 }
 
 std::vector<utils::Point2D> breadthFirst(const std::vector<char>& grid, const utils::Point2D& start,
@@ -135,7 +205,7 @@ void day12(const char* fp)
   }
 
   auto path = breadthFirst(grid, start, end_pt, rows, cols);
-  std::cout << "Path length: " << path.size() << '\n';
+  std::cout << "Path length: " << path.size() << '\n'; // 449
 
   int min_path_len = std::numeric_limits<int>::max();
   for (const auto& a_id : a_ids)
@@ -151,7 +221,7 @@ void day12(const char* fp)
       }
     }
   }
-  std::cout << "Min path length: " << min_path_len << '\n';
+  std::cout << "Min path length: " << min_path_len << '\n'; // 443
 }
 } // namespace AoC2022
 
