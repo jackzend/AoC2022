@@ -1,11 +1,88 @@
+#include <queue>
 #include <utils/basic_timer.h>
 #include <utils/constexpr_map.h>
 #include <utils/graph.h>
 #include <utils/parse.h>
+#include <utils/third_party/gtl/phmap.hpp>
 
 namespace AoC2022
 {
 constexpr std::string_view input_fp = "/home/jack-slip/AoC2022/input/day12.txt";
+
+inline size_t getIdx(int row, int col, int cols) { return row * cols + col; }
+
+std::vector<utils::Point2D> getNeighbors(const std::vector<char>& grid, const utils::Point2D& pt,
+                                         int rows, int cols)
+{
+  const std::array<utils::Point2D, 4> dirs = {{{-1, 0}, {1, 0}, {0, -1}, {0, 1}}};
+  std::vector<utils::Point2D> neighbors;
+
+  char curr = grid[getIdx(pt.y, pt.x, cols)];
+
+  for (const auto& dir : dirs)
+  {
+    utils::Point2D neighbor = pt + dir;
+    if (neighbor.x >= 0 && neighbor.y >= 0 && neighbor.x < cols && neighbor.y < rows)
+    {
+      char c = grid[getIdx(neighbor.y, neighbor.x, cols)];
+
+      if ((int)c - (int)curr <= 1)
+        neighbors.push_back(neighbor);
+    }
+  }
+
+  return neighbors;
+}
+
+int breadthFirst(const std::vector<char>& grid, const utils::Point2D& start,
+                 const utils::Point2D& end, int rows, int cols)
+{
+  std::queue<utils::Point2D> stack;
+  std::vector<bool> visited(rows * cols, false);
+  // std::unordered_map<utils::Point2D, utils::Point2D, utils::Point2DHash> parent;
+  gtl::flat_hash_map<utils::Point2D, utils::Point2D, utils::Point2DHash> parent;
+
+  stack.push(start);
+  visited[getIdx(start.y, start.x, cols)] = true;
+  parent[start] = start;
+
+  while (!stack.empty())
+  {
+    utils::Point2D curr = stack.front();
+    stack.pop();
+
+    if (curr == end)
+      break;
+
+    auto neighbors = getNeighbors(grid, curr, rows, cols);
+
+    for (const auto& neighbor : neighbors)
+    {
+      if (!visited[getIdx(neighbor.y, neighbor.x, cols)])
+      {
+        visited[getIdx(neighbor.y, neighbor.x, cols)] = true;
+        stack.push(neighbor);
+        parent[neighbor] = curr;
+      }
+    }
+  }
+
+  auto curr = end;
+  int path_len = 0;
+  // std::vector<utils::Point2D> path;
+  while (curr != start)
+  {
+    curr = parent[curr];
+    // path.push_back(curr);
+    ++path_len;
+  }
+
+  // std::reverse(path.begin(), path.end());
+  // for (const auto& pt : path)
+  //   std::cout << "(" << pt.x << ", " << pt.y << ")\n";
+
+  return path_len;
+}
 
 void day12(const char* fp)
 {
@@ -31,11 +108,13 @@ void day12(const char* fp)
       if (c == 'S')
       {
         // process start
+        c = 'a';
         start = {i, rows};
       }
       if (c == 'E')
       {
         // process end
+        c = 'z';
         end_pt = {i, rows};
       }
       grid.push_back(c);
@@ -43,6 +122,9 @@ void day12(const char* fp)
     }
     ++rows;
   }
+
+  int path_len = breadthFirst(grid, start, end_pt, rows, cols);
+  std::cout << "Path length: " << path_len << '\n';
 }
 } // namespace AoC2022
 
