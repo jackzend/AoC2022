@@ -34,8 +34,8 @@ std::vector<utils::Point2D> getNeighbors(const std::vector<char>& grid, const ut
   return neighbors;
 }
 
-int breadthFirst(const std::vector<char>& grid, const utils::Point2D& start,
-                 const utils::Point2D& end, int rows, int cols)
+std::vector<utils::Point2D> breadthFirst(const std::vector<char>& grid, const utils::Point2D& start,
+                                         const utils::Point2D& end, int rows, int cols)
 {
   std::queue<utils::Point2D> stack;
   std::vector<bool> visited(rows * cols, false);
@@ -46,14 +46,18 @@ int breadthFirst(const std::vector<char>& grid, const utils::Point2D& start,
   visited[getIdx(start.y, start.x, cols)] = true;
   parent[start] = start;
 
+  bool path_found = false;
+
   while (!stack.empty())
   {
     utils::Point2D curr = stack.front();
     stack.pop();
 
     if (curr == end)
+    {
+      path_found = true;
       break;
-
+    }
     auto neighbors = getNeighbors(grid, curr, rows, cols);
 
     for (const auto& neighbor : neighbors)
@@ -67,13 +71,16 @@ int breadthFirst(const std::vector<char>& grid, const utils::Point2D& start,
     }
   }
 
+  if (!path_found)
+    return {};
+
   auto curr = end;
   int path_len = 0;
-  // std::vector<utils::Point2D> path;
+  std::vector<utils::Point2D> path;
   while (curr != start)
   {
     curr = parent[curr];
-    // path.push_back(curr);
+    path.push_back(curr);
     ++path_len;
   }
 
@@ -81,7 +88,7 @@ int breadthFirst(const std::vector<char>& grid, const utils::Point2D& start,
   // for (const auto& pt : path)
   //   std::cout << "(" << pt.x << ", " << pt.y << ")\n";
 
-  return path_len;
+  return path;
 }
 
 void day12(const char* fp)
@@ -98,6 +105,8 @@ void day12(const char* fp)
 
   utils::Point2D start;
   utils::Point2D end_pt;
+
+  std::vector<utils::Point2D> a_ids;
 
   while (!(line_sv = utils::getLine(line, end)).empty())
   {
@@ -117,14 +126,32 @@ void day12(const char* fp)
         c = 'z';
         end_pt = {i, rows};
       }
+      if (c == 'a')
+        a_ids.push_back({i, rows});
       grid.push_back(c);
       ++i;
     }
     ++rows;
   }
 
-  int path_len = breadthFirst(grid, start, end_pt, rows, cols);
-  std::cout << "Path length: " << path_len << '\n';
+  auto path = breadthFirst(grid, start, end_pt, rows, cols);
+  std::cout << "Path length: " << path.size() << '\n';
+
+  int min_path_len = std::numeric_limits<int>::max();
+  for (const auto& a_id : a_ids)
+  {
+    if (!(path = breadthFirst(grid, a_id, end_pt, rows, cols)).empty())
+    {
+      int path_len = path.size();
+      // std::cout << "Path length: " << path_len << '\n';
+      if (path_len < min_path_len and path_len != -1)
+      {
+        min_path_len = path_len;
+        // std::cout << "New min path length: " << min_path_len << '\n';
+      }
+    }
+  }
+  std::cout << "Min path length: " << min_path_len << '\n';
 }
 } // namespace AoC2022
 
